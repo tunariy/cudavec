@@ -80,7 +80,7 @@ namespace cudavec {
 			return;
 		}
 
-		std::clog << "Initializing context for device: " << deviceProps.name << std::endl;
+		std::clog << "Initializing context for device: " << std::endl;
 
 		KernelWarmup << <1, 1 >> > ();
 		cudaDeviceSynchronize();
@@ -233,7 +233,8 @@ namespace cudavec {
 		else if (hostMemorySize > operandAllocSize + resultAllocSize) {
 			std::clog << "only VRAM is enough\n";
 			return matmul_cuda_VRAM(host_a, host_b, M, N, K);
-		}else{
+		}
+		else {
 			return {};
 		}
 	}
@@ -345,8 +346,8 @@ namespace cudavec {
 		dim3 blocks((N + threads.x - 1) / threads.x,
 			(M + threads.y - 1) / threads.y);
 		{
-			std::cout << "cuda time:" << std::endl;
-			benchtools::Timer timer;
+			// std::cout << "cuda time:" << std::endl;
+			// benchtools::Timer timer;
 			matmul_kernel << <blocks, threads, 0, cudaStream >> > (dev_a, dev_b, host_c, M, N, K);
 		}
 		cudaStreamSynchronize(cudaStream);
@@ -409,8 +410,8 @@ namespace cudavec {
 
 		if (std::is_same<Ty_, float>::value) {
 			{
-				benchtools::Timer timer;
-				std::cout << "cublas time:" << std::endl;
+				// benchtools::Timer timer;
+				// std::cout << "cublas time:" << std::endl;
 				cublasSgemm_v2(
 					handle,
 					CUBLAS_OP_N, CUBLAS_OP_N,
@@ -425,7 +426,7 @@ namespace cudavec {
 		}
 		else {
 			{
-				benchtools::Timer timer;
+				// benchtools::Timer timer;
 				std::cout << "cublas time:" << std::endl;
 				cublasSgemm_v2(
 					handle,
@@ -447,7 +448,7 @@ namespace cudavec {
 		cudaFree(dev_b);
 		cudaFree(dev_c);
 		cudaStreamDestroy(stream);
-		cublasDestroy(handle);
+		// cublasDestroy(handle);
 
 		return res;
 	}

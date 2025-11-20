@@ -223,11 +223,10 @@ namespace cudavec {
 		// std::clog << resultAllocSize << " megabytes required for result (3-like-system) allocation" << std::endl;
 
 		if (operandAllocSize + resultAllocSize >= memoryStatus.mFreeAmount) {
-			// std::cerr << "Not enough VRAM for the process!\n";
+			std::cerr << "Not enough VRAM for the process!\n";
 			return {};
 		}
 		else if (hostMemorySize > operandAllocSize + resultAllocSize && memoryStatus.mFreeAmount > operandAllocSize + resultAllocSize) {
-			// std::clog << "Pagelocked should be enough\n";
 			return matmul_cuda_SHARED(host_a, host_b, M, N, K);
 		}
 		else if (hostMemorySize > operandAllocSize + resultAllocSize) {
@@ -441,14 +440,13 @@ namespace cudavec {
 			}
 		}
 		std::vector<Ty_> res = std::vector<Ty_>(M * N);
-		// cudaMemcpyAsync(res.data(), dev_c, M * N * sizeof(Ty_), cudaMemcpyDeviceToHost, stream);
+		cudaMemcpyAsync(res.data(), dev_c, M * N * sizeof(Ty_), cudaMemcpyDeviceToHost, stream);
 		cudaDeviceSynchronize();
 
 		cudaFree(dev_a);
 		cudaFree(dev_b);
 		cudaFree(dev_c);
 		cudaStreamDestroy(stream);
-		// cublasDestroy(handle);
 
 		return res;
 	}

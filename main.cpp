@@ -1,6 +1,4 @@
 #include <cudavec.cuh>
-
-// Custom library
 #include <benchmark.h>
 
 using namespace benchtools;
@@ -23,35 +21,44 @@ int main() {
 		}
 		std::clog << "Testing: " << dim << "x" << dim << ".\n";
 		logger.log(std::to_string(size));
-		std::chrono::duration<double> dur1, dur2, dur3, dur4;
+		std::chrono::duration<double> dur1, dur2, dur3, dur4, dur5;
 		for (uint32_t i = 0; i < sample_size; i++) {
 			std::vector<float> res1;
 			{
 				benchtools::Timer timer;
 				res1 = matmul_cublas(A.data(), B.data(), dim, dim, dim);
 			} dur1 = LAST_DURATION;
-
 			{
 				benchtools::Timer timer;
 				res1 = matmul_cuda(A.data(), B.data(), dim, dim, dim);
 			} dur2 = LAST_DURATION;
 			{
 				benchtools::Timer timer;
-				res1 = matmul_flat(A.data(), B.data(), dim, dim, dim);
+				res1 = matmul_cuda_SHARED(A.data(), B.data(), dim, dim, dim);
 			} dur3 = LAST_DURATION;
+			{
+				benchtools::Timer timer;
+				res1 = matmul_flat(A.data(), B.data(), dim, dim, dim);
+			} dur4 = LAST_DURATION;
 
 #if OS_WINDOWS
 			{
 				benchtools::Timer timer;
 				res1 = matmul_avx(A.data(), B.data(), dim, dim, dim);
 #endif
-			} dur4 = LAST_DURATION;
+			} dur5 = LAST_DURATION;
 		}
+		// std::cout << std::chrono::duration_cast<std::chrono::milliseconds>(dur1).count() << std::endl;
+		// std::cout << std::chrono::duration_cast<std::chrono::milliseconds>(dur2).count() << std::endl;
+		// std::cout << std::chrono::duration_cast<std::chrono::milliseconds>(dur3).count() << std::endl;
+		// std::cout << std::chrono::duration_cast<std::chrono::milliseconds>(dur4).count() << std::endl;
+		// std::cout << std::chrono::duration_cast<std::chrono::milliseconds>(dur5).count() << std::endl;
 
-		logger.log(std::to_string(durationCast(dur1, timeunit::nanosecond).count()));
-		logger.log(std::to_string(durationCast(dur2, timeunit::nanosecond).count()));
-		logger.log(std::to_string(durationCast(dur3, timeunit::nanosecond).count()));
-		logger.log(std::to_string(durationCast(dur4, timeunit::nanosecond).count()));
+		logger.log(std::to_string(std::chrono::duration_cast<std::chrono::nanoseconds>(dur1).count()));
+		logger.log(std::to_string(std::chrono::duration_cast<std::chrono::nanoseconds>(dur2).count()));
+		logger.log(std::to_string(std::chrono::duration_cast<std::chrono::nanoseconds>(dur3).count()));
+		logger.log(std::to_string(std::chrono::duration_cast<std::chrono::nanoseconds>(dur4).count()));
+		logger.log(std::to_string(std::chrono::duration_cast<std::chrono::nanoseconds>(dur5).count()));
 	}
 #elif 0
 	Logger logger{ "log.txt", OVERWRITE };
@@ -69,24 +76,20 @@ int main() {
 		}
 		std::clog << "Testing: " << dim << "x" << dim << ".\n";
 		logger.log(std::to_string(size));
-		std::chrono::duration<double> dur1, dur2, dur3, dur4;
+		std::chrono::duration<double> dur1, dur2;
 		for (uint32_t i = 0; i < sample_size; i++) {
 			std::vector<float> res1;
 			{
-				// benchtools::Timer timer;
 				res1 = matmul_cublas(A.data(), B.data(), dim, dim, dim);
 			} dur1 = LAST_DURATION;
-
 			{
-				// benchtools::Timer timer;
+		
 				res1 = matmul_cuda(A.data(), B.data(), dim, dim, dim);
 			} dur2 = LAST_DURATION;
 		}
 
 		logger.log(std::to_string(durationCast(dur1, timeunit::nanosecond).count()));
 		logger.log(std::to_string(durationCast(dur2, timeunit::nanosecond).count()));
-		logger.log("0");
-		logger.log("0");
 	}
 #else
 #endif

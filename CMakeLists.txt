@@ -24,7 +24,7 @@ set_target_properties(cudavec PROPERTIES
   CXX_STANDARD 17
   CUDA_STANDARD 14
   CUDA_SEPARABLE_COMPILATION ON
-  CUDA_ARCHITECTURES 75
+  CUDA_ARCHITECTURES 86
 )
 
 message("Compiler options setup done.")

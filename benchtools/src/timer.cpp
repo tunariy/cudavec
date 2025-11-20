@@ -1,24 +1,23 @@
 #include <timer.h>
 
-// #define EXPLICIT_LOG
-
 namespace benchtools {
     std::chrono::steady_clock::duration LAST_DURATION{};
 
     Timer::Timer() {
         mStart = std::chrono::steady_clock::now();
+        mUnit = timeunit::nanosecond;
     }
 
     Timer::Timer(const timeunit& unit = timeunit::nanosecond) {
         mStart = std::chrono::steady_clock::now();
         mUnit = unit;
     };
-#ifndef EXPLICIT_TIMER
+#if !EXPLICIT_TIMER
     Timer::~Timer() {
         std::chrono::steady_clock::time_point end = std::chrono::steady_clock::now();
         mDuration = end - mStart;
         LAST_DURATION = end - mStart;
-#ifndef EXPLICIT_LOG
+#if !EXPLICIT_LOG
         switch (mUnit) {
         case timeunit::nanosecond:
             std::clog << "Duration(ns): " << std::chrono::duration_cast<std::chrono::nanoseconds>(mDuration).count() << "ns" << std::endl;
@@ -51,7 +50,7 @@ namespace benchtools {
     explicit Timer::~Timer() {
         std::chrono::steady_clock::time_point end = std::chrono::steady_clock::now();
         mDuration = end - mStart;
-        last_duration = mDuration;
+        LAST_DURATION = end - mStart;
         switch (mUnit) {
         case timeunit::nanosecond:
             std::clog << "Duration(ns): " << std::chrono::duration_cast<std::chrono::nanoseconds>(mDuration).count() << "ns" << std::endl;
@@ -88,19 +87,19 @@ namespace benchtools {
         if (unit == nanosecond) {
             return std::chrono::duration_cast<std::chrono::nanoseconds>(otherDuration);
         }
-        else if (unit == nanosecond) {
+        else if (unit == microsecond) {
             return std::chrono::duration_cast<std::chrono::microseconds>(otherDuration);
         }
-        else if (unit == nanosecond) {
+        else if (unit == milisecond) {
             return std::chrono::duration_cast<std::chrono::milliseconds>(otherDuration);
         }
-        else if (unit == nanosecond) {
+        else if (unit == second) {
             return std::chrono::duration_cast<std::chrono::seconds>(otherDuration);
         }
-        else if (unit == nanosecond) {
+        else if (unit == minute) {
             return std::chrono::duration_cast<std::chrono::minutes>(otherDuration);
         }
-        else if (unit == nanosecond) {
+        else if (unit == hour) {
             return std::chrono::duration_cast<std::chrono::hours>(otherDuration);
         }
         else {
@@ -117,8 +116,7 @@ std::string return_current_time_and_date() {
     struct tm time_info;
 #if defined(__GNUG__)
 #define COMPILER_GCC
-    // localtime_r(&in_time_t, &time_info); WTF
-    localtime_s(&time_info, &in_time_t);
+    localtime_s(&time_info, &in_time_t); // huh
 #elif defined(_MSC_VER)
     localtime_s(&time_info, &in_time_t);
 #endif

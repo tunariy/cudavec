@@ -12,21 +12,27 @@ set(CMAKE_CUDA_FLAGS "${CMAKE_CUDA_FLAGS} -rdc=true")
 list(APPEND CMAKE_PREFIX_PATH "/opt/cuda")
 find_package(CUDAToolkit REQUIRED COMPONENTS cublas)
 
+include(FetchContent)
+FetchContent_Declare(
+    Benchtools
+    GIT_REPOSITORY https://github.com/tunariy/benchmark.git
+    GIT_TAG v1.0.0
+)
 
-list(APPEND CMAKE_PREFIX_PATH "${CMAKE_CURRENT_SOURCE_DIR}/benchtools/lib/cmake/Benchtools")
-find_package(Benchtools REQUIRED)
+FetchContent_MakeAvailable(Benchtools)
 
 add_subdirectory(src)
 add_executable(cudavec main.cpp)
-set_source_files_properties(main.cpp PROPERTIES LANGUAGE CUDA)
+
+# set_source_files_properties(main.cpp PROPERTIES LANGUAGE CUDA)
 
 target_link_libraries(cudavec
     PRIVATE
     cudavec_core             
     CUDA::cublas             
     CUDA::cudart             
-    Benchtools::Core         
-    Benchtools::Logger
-    Benchtools::Timer
+    Core         
+    Logger
+    Timer
     spdlog::spdlog
 )

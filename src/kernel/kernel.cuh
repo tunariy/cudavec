@@ -35,7 +35,7 @@ __global__ void divKernel(Ty_ *c, const Ty_ *a, const Ty_ *b, uint32_t size) {
 }
 
 template <typename Ty_>
-__global__ void addEqualsKernel(Ty_ *c, const Ty_ *a, const Ty_ &b,
+__global__ void addEqualsKernel(Ty_ *c, const Ty_ *a, Ty_ b,
                                 uint32_t size) {
   int i = blockIdx.x * blockDim.x + threadIdx.x;
   if (i < size) {
@@ -44,7 +44,7 @@ __global__ void addEqualsKernel(Ty_ *c, const Ty_ *a, const Ty_ &b,
 }
 
 template <typename Ty_>
-__global__ void mulEqualsKernel(Ty_ *c, const Ty_ *a, const Ty_ &b,
+__global__ void mulEqualsKernel(Ty_ *c, const Ty_ *a, Ty_ b,
                                 uint32_t size) {
   int i = blockIdx.x * blockDim.x + threadIdx.x;
   if (i < size) {
@@ -53,7 +53,7 @@ __global__ void mulEqualsKernel(Ty_ *c, const Ty_ *a, const Ty_ &b,
 }
 
 template <typename Ty_>
-__global__ void divEqualsKernel(Ty_ *c, const Ty_ *a, const Ty_ &b,
+__global__ void divEqualsKernel(Ty_ *c, const Ty_ *a, Ty_ b,
                                 uint32_t size) {
   int i = blockIdx.x * blockDim.x + threadIdx.x;
   if (i < size) {

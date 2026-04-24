@@ -1,4 +1,3 @@
-#include "benchtools/Core/Time.hpp"
 #include <core.cuh>
 #include <matrix.cuh>
 
@@ -6,8 +5,7 @@
 #include <benchtools/Timers/ScopedTimer.hpp>
 #include <benchtools/Timers/WallTimer.hpp>
 
-
-#include <cstdint>
+#include <iostream>
 #include <vector>
 
 int main() {

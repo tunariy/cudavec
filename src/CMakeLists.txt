@@ -1,14 +1,16 @@
 add_library(cudavec_core STATIC
     core/core.cu
+    wrappers/matrix.cu
+    wrappers/operand.cu
 )
 
 target_link_libraries(cudavec_core
     PUBLIC
     CUDA::cublas
     CUDA::cudart
-    Benchtools::Core
-    Benchtools::Logger
-    Benchtools::Timer
+    Core
+    Logger
+    Timer
 )
 
 target_include_directories(cudavec_core

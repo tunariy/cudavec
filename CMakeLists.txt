@@ -1,33 +1,32 @@
-cmake_minimum_required(VERSION 3.18)
+cmake_minimum_required(VERSION 3.21)
 project(cudavec LANGUAGES CXX CUDA)
 
-find_package(CUDAToolkit REQUIRED)
+set(CMAKE_CXX_STANDARD 20)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+set(CMAKE_CXX_EXTENSIONS OFF)
 
-file(GLOB_RECURSE SRC_FILES CONFIGURE_DEPENDS "${CMAKE_SOURCE_DIR}/benchtools/src/*.cpp")
+set(CMAKE_CUDA_ARCHITECTURES "80;86;89" CACHE STRING "CUDA architectures")
+set(CMAKE_CUDA_SEPARABLE_COMPILATION ON)
+set(CMAKE_CUDA_FLAGS "${CMAKE_CUDA_FLAGS} -rdc=true")
 
-add_executable(cudavec
-  "${CMAKE_SOURCE_DIR}/main.cpp"
-  "${CMAKE_SOURCE_DIR}/cudavec/cudavec.cu"
-  ${SRC_FILES}
+list(APPEND CMAKE_PREFIX_PATH "/opt/cuda")
+find_package(CUDAToolkit REQUIRED COMPONENTS cublas)
+
+
+list(APPEND CMAKE_PREFIX_PATH "${CMAKE_CURRENT_SOURCE_DIR}/benchtools/lib/cmake/Benchtools")
+find_package(Benchtools REQUIRED)
+
+add_subdirectory(src)
+add_executable(cudavec main.cpp)
+set_source_files_properties(main.cpp PROPERTIES LANGUAGE CUDA)
+
+target_link_libraries(cudavec
+    PRIVATE
+    cudavec_core             
+    CUDA::cublas             
+    CUDA::cudart             
+    Benchtools::Core         
+    Benchtools::Logger
+    Benchtools::Timer
+    spdlog::spdlog
 )
-
-target_include_directories(cudavec PRIVATE
-  "${CMAKE_SOURCE_DIR}/benchtools/headers"
-  "${CMAKE_SOURCE_DIR}/cudavec"
-)
-
-# Suppress some specific warnings
-add_compile_options(/wd4533)
-set(CMAKE_CUDA_FLAGS "${CMAKE_CUDA_FLAGS} --diag-suppress=940 --diag-suppress=546")
-
-set_target_properties(cudavec PROPERTIES
-  CXX_STANDARD 17
-  CUDA_STANDARD 14
-  CUDA_SEPARABLE_COMPILATION ON
-  CUDA_ARCHITECTURES 86
-)
-
-message("Compiler options setup done.")
-
-target_link_libraries(cudavec PRIVATE CUDA::cudart CUDA::cublas)
-message("CUDA runtime and cublas linked.")
